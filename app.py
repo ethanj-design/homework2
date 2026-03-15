@@ -4,11 +4,13 @@ from pathlib import Path
 import time
 import uuid
 
+# Setup the page
 st.set_page_config(
         page_title="Coffee Kiosk App", 
         layout="centered"
         )
 
+# Setup json files
 json_file = Path("inventory.json")
 json_file_orders = Path("orders.json")
 
@@ -28,30 +30,32 @@ else:
 
 
 
-
+# App Starts Here
 st.title("Coffee Kiosk App")
 
-tab1, tab2, tab3, tab4 = st.tabs(["Order Creator", "Inventory Viewer", "Restock", "Manage Orders"])
+create, read, update, delete = st.tabs(["Order Creator", "Inventory Viewer", "Restock", "Manage Orders"])
 
-with tab1:
+with create:
 
     inv_items = []
     for items in inventory:
         inv_items.append(items["name"])
 
-
     #UI Items
     selected_item = st.selectbox("Select an item", inv_items, key="selected_item")
-    order_quantity = st.number_input("Item Quantity", key="order_quantity",min_value=1,step=1)
-    customer_name = st.text_input("Name",placeholder="Ex: John Doe", key = "customer_name")
+
+    order_quantity = st.number_input("Item Quantity", key="order_quantity",
+                                        min_value=1,step=1) #Ensure we cant enter negative items, or decimal amounts of items. I did lookup how to do this.
+
+    customer_name = st.text_input("Name",placeholder="Ex: John Doe", key="customer_name")
     btn_order = st.button("Submit Order",width="stretch",disabled=False,key="btn_order")
 
-
+    #READ
     if btn_order:
         
         #check for required items
-        if not selected_item or not order_quantity or not customer_name:
-            st.warning("Insert all required information!")
+        if not customer_name:
+            st.warning("Please insert your name!")
 
         else:
             with st.spinner("Order is being recorded..."):
@@ -60,40 +64,38 @@ with tab1:
                 #check if item is in stock
                 for item in inventory:
                     if item["name"] == selected_item:
+
                         stock = item["stock"]
-                if stock < order_quantity:
-                    st.warning("item is not in stock!")
 
-                else: 
-                    
-                    #add order
-                    orders.append(
-                        {
-                            "id" : str(uuid.uuid4()),
-                            "item" : selected_item,
-                            "quantity" : order_quantity,
-                            "name" : customer_name
-                        }
-                    )
-                    with json_file_orders.open("w",encoding="utf-8") as f:
-                        json.dump(orders,f)
-                    
-                    #reduce stock
-                    for item in inventory:
-                        if item["name"] == selected_item:
+                        #check the stock level
+                        if stock < order_quantity: 
+                            st.warning("Not enough stock to fulfill your order.")
+                        else: 
+
+                            #reduce stock
                             item["stock"] -= order_quantity
-                    
-                    with json_file.open("w",encoding="utf-8") as f:
-                        json.dump(inventory, f)
-                    
-                    #output
-                    st.success("Order is created!")
-                
 
 
-                
-        
-            
-            
+                            #now add order
+                            orders.append(
+                                {
+                                    "id" : str(uuid.uuid4()),
+                                    "item" : selected_item,
+                                    "quantity" : order_quantity,
+                                    "name" : customer_name
+                                }
+                            )
+
+
+                            #rewrite the infomation into the json files to ensure stateful app
+                            with json_file_orders.open("w",encoding="utf-8") as f:
+                                json.dump(orders,f)
+                            
+                            with json_file.open("w",encoding="utf-8") as f:
+                                json.dump(inventory, f)
+                            
+
+                            #successful output
+                            st.success("Order is created!")
 
 
