@@ -15,7 +15,7 @@
         "id": 3,
         "name": "Cold Brew",
         "price": 3.75,
-        "stock": 30
+        "stock": 40
     },
     {
         "id": 4,
@@ -27,6 +27,6 @@
         "id": 5,
         "name": "Blueberry Muffin",
         "price": 2.95,
-        "stock": 118
+        "stock": 18
     }
 ]

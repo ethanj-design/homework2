@@ -7,7 +7,8 @@ import uuid
 # Setup the page
 st.set_page_config(
         page_title="Coffee Kiosk App", 
-        layout="centered"
+        layout="centered",
+        page_icon="☕"
         )
 
 # Setup json files
@@ -233,14 +234,7 @@ with delete:
             st.success("Order cancelled!")
             time.sleep(3)
             st.rerun()
+
         elif not found_order and not alr_cancelled:
             st.warning("Order ID was not found.")
-
-                            
-                            
-
-             
-
-
-
 
