@@ -1,1 +1,50 @@
-[{"id": "43bac1a3-0ca0-4687-9bbb-4fbe827253f2", "item": "Cold Brew", "quantity": 1.0, "name": "Adrian Castro"}, {"id": "4b63f8f7-a546-4f73-bbf4-5b4d2045244b", "item": "Cold Brew", "quantity": 1.0, "name": "Adrian Castro"}, {"id": "cadf90a3-14bf-4f53-95e7-2646aebdaae2", "item": "Latte", "quantity": 2.0, "name": "Ethan"}]
+[
+    {
+        "id": "fa625098-4151-4d1d-8773-b08fba070745",
+        "item": "Espresso",
+        "quantity": 1,
+        "price": 2.5,
+        "name": "Ethan",
+        "status": "Cancelled"
+    },
+    {
+        "id": "d2e11c9a-eed4-4c9b-bd08-379ed4239976",
+        "item": "Espresso",
+        "quantity": 35,
+        "price": 87.5,
+        "name": "Adrian C",
+        "status": "Cancelled"
+    },
+    {
+        "id": "6bf3bc4b-ddfa-4d00-b527-2965c3802082",
+        "item": "Blueberry Muffin",
+        "quantity": 1,
+        "price": 2.95,
+        "name": "Adrian C",
+        "status": "Cancelled"
+    },
+    {
+        "id": "09ad6962-2a7f-4bd1-9f91-bfc77b67eca9",
+        "item": "Blueberry Muffin",
+        "quantity": 1,
+        "price": 2.95,
+        "name": "Adrian C",
+        "status": "Cancelled"
+    },
+    {
+        "id": "c5ce912b-32e4-41e2-9856-1214c063b295",
+        "item": "Blueberry Muffin",
+        "quantity": 15,
+        "price": 44.25,
+        "name": "Me",
+        "status": "Cancelled"
+    },
+    {
+        "id": "f35972e1-5be6-4b7e-a225-cb9d12b4c07f",
+        "item": "Blueberry Muffin",
+        "quantity": 15,
+        "price": 44.25,
+        "name": "Me",
+        "status": "Cancelled"
+    }
+]

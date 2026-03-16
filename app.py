@@ -66,6 +66,7 @@ with create:
                     if item["name"] == selected_item:
 
                         stock = item["stock"]
+                        item_price = item["price"]
 
                         #check the stock level
                         if stock < order_quantity: 
@@ -74,6 +75,7 @@ with create:
 
                             #reduce stock
                             item["stock"] -= order_quantity
+                            order_price = order_quantity * item_price
 
 
                             #now add order
@@ -82,20 +84,163 @@ with create:
                                     "id" : str(uuid.uuid4()),
                                     "item" : selected_item,
                                     "quantity" : order_quantity,
-                                    "name" : customer_name
+                                    "price" : order_price,
+                                    "name" : customer_name,
+                                    "status" : "Placed"
                                 }
                             )
 
 
                             #rewrite the infomation into the json files to ensure stateful app
                             with json_file_orders.open("w",encoding="utf-8") as f:
-                                json.dump(orders,f)
+                                json.dump(orders,f, indent=4)
                             
                             with json_file.open("w",encoding="utf-8") as f:
-                                json.dump(inventory, f)
+                                json.dump(inventory, f,indent=4)
                             
 
                             #successful output
                             st.success("Order is created!")
+
+with read:
+
+    inv_items = []
+    for item in inventory:
+        inv_items.append(item["name"])
+
+    selected_search_item = st.selectbox("Select an item", inv_items, key="search_item")
+
+    query_data = []
+    order_metric = 0
+
+    for item in inventory:
+        if item["name"] == selected_search_item:
+            query_data.append(item)
+            stock_metric = item["stock"]
+            price_metric = item["price"]
+    
+    for o in orders: 
+        if o["item"] == selected_search_item:
+            order_metric += 1
+
+
+    col1, col2, col3 = st.columns([1,1,1])
+
+    
+    st.markdown(f"### Table for {selected_search_item}")
+
+
+    if query_data:
+        
+        with col1: 
+            stock_info = st.metric("Total items in stock: ", stock_metric)
+        with col2: 
+            price_info = st.metric("Item Price", price_metric)
+        with col3:
+            order_info = st.metric("Orders with Item", order_metric)
+            
+
+        st.dataframe(query_data)
+
+with update:
+
+    inv_items = []
+    for item in inventory:
+        inv_items.append(item["name"])
+
+    selected_restock_item = st.selectbox("Select an item", inv_items, key="restock_item")
+    added_amount = st.number_input("Restock Quantity",min_value=1,step=1,key="added_amount")
+    add_btn = st.button("Add items to stock",width="stretch", disabled=False,key="add_btn")
+
+    if add_btn:
+
+        with st.spinner("Updating inventory level..."):
+
+            time.sleep(5)
+
+            for item in inventory:
+                if item["name"] == selected_restock_item:
+                    item["stock"] += added_amount
+            
+            with json_file.open("w",encoding="utf-8") as f:
+                json.dump(inventory, f,indent=4)
+            
+            st.success("Items added to stock!")
+            time.sleep(3)
+            st.rerun()
+
+
+with delete:
+
+
+    # ui elements
+    selected_order = st.text_input("Order ID",placeholder="Ex: 1",
+                                    help="Copy the ID from the dataframe and paste it into the box.", key="selected_order")
+    delete_btn = st.button("Cancel this order", width="stretch", disabled=False, key="delete_btn")
+    st.dataframe(orders)
+
+
+
+    if delete_btn:
+
+        found_order = False
+        alr_cancelled = False
+
+        if not selected_order:
+            st.warning("Please select an order ID. See the help section for more information.")
+
+        else:
+            with st.spinner("Cancelling order..."):
+                time.sleep(5)
+
+
+                for o in orders:
+                    if o["id"] == selected_order:
+
+                        found_order = True
+
+                        # check if order already cancelled
+                        if o["status"] == "Cancelled":
+                            st.warning("Order already cancelled.")
+                            alr_cancelled = True
+                            
+                        else:
+
+                            # set order status
+                            o["status"] = "Cancelled"
+
+
+
+                            # add back stock
+                            for item in inventory:
+                                if item["name"] == o["item"]:
+                                    item["stock"] += o["quantity"]
+
+
+
+                            
+                            # update the json files
+                            with json_file.open("w",encoding="utf-8") as f:
+                                json.dump(inventory, f,indent=4)
+                            
+                            with json_file_orders.open("w",encoding="utf-8") as f:
+                                json.dump(orders,f,indent=4)
+                            
+        
+
+        # success if found
+        if found_order and not alr_cancelled:
+            st.success("Order cancelled!")
+            time.sleep(3)
+            st.rerun()
+        elif not found_order and not alr_cancelled:
+            st.warning("Order ID was not found.")
+
+                            
+                            
+
+             
+
+
 
 
